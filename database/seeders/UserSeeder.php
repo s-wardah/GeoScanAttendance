@@ -61,10 +61,5 @@ class UserSeeder extends Seeder
             'radius' => 50,
             'qr_content' => 'ROOM-LABKOM-01',
         ]);
-
-        // Class
-        \App\Models\Classes::create([
-            'class_name' => 'XII RPL 1',
-        ]);
     }
 }

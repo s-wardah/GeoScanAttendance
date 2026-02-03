@@ -1,222 +1,294 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h3 class="fw-bold text-indigo mb-1">Manajemen Data Guru</h3>
-            <p class="text-muted small mb-0">Kelola informasi kepegawaian dan konfigurasi penggajian.</p>
+<div class="container-fluid py-4 px-lg-4">
+    <div class="row align-items-center mb-4">
+        <div class="col">
+            <h3 class="fw-bold text-slate-900 mb-1">Database Guru</h3>
+            <p class="text-muted small mb-0">Kelola profil kepegawaian dan konfigurasi sistem penggajian.</p>
         </div>
-        <div class="badge bg-indigo-soft text-indigo p-2 px-3 rounded-pill">
-            <i class="bi bi-person-check-fill me-1"></i> Total: {{ $teachers->count() }} Guru
+        <div class="col-auto d-flex gap-3">
+            <div class="bg-white shadow-sm border rounded-pill px-3 py-2 d-none d-md-flex align-items-center">
+                <i class="bi bi-people-fill text-indigo me-2"></i>
+                <span class="small fw-bold text-slate-700">{{ $teachers->count() }} Terdaftar</span>
+            </div>
+            <button class="btn btn-indigo shadow-indigo rounded-3 py-2 px-4 fw-bold text-white border-0"
+                data-bs-toggle="modal" data-bs-target="#addTeacherModal">
+                <i class="bi bi-person-plus-fill me-2"></i>Tambah Guru Baru
+            </button>
         </div>
     </div>
 
-    <div class="row g-4">
-        <div class="col-lg-4">
-            <div class="card border-0 shadow-sm sticky-top" style="top: 20px; border-radius: 1.25rem;">
-                <div class="card-body p-4">
-                    <div class="d-flex align-items-center mb-4">
-                        <div class="bg-indigo text-white rounded-3 p-2 me-3">
-                            <i class="bi bi-person-plus-fill fs-5"></i>
-                        </div>
-                        <h5 class="fw-bold mb-0">Daftarkan Guru</h5>
-                    </div>
+    @if(session('success'))
+    <div class="alert alert-success border-0 shadow-sm rounded-4 mb-4 d-flex align-items-center">
+        <i class="bi bi-check-circle-fill fs-5 me-3"></i>
+        <div>{{ session('success') }}</div>
+        <button type="button" class="btn-close ms-auto" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
 
-                    @if(session('success'))
-                    <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4">
-                        {{ session('success') }}
-                    </div>
-                    @endif
-                    
-                    <form action="{{ route('admin.teachers.store') }}" method="POST">
-                        @csrf
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted mb-2">Nama Lengkap</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-0"><i class="bi bi-person text-muted"></i></span>
-                                <input type="text" name="name" class="form-control bg-light border-0" placeholder="Nama tanpa gelar..." required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted mb-2">Email Guru</label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-0"><i class="bi bi-envelope text-muted"></i></span>
-                                <input type="email" name="email" class="form-control bg-light border-0" placeholder="guru@sekolah.com" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="small fw-bold text-muted mb-2">Tipe Pegawai</label>
-                            <select name="type" id="typeSelector" class="form-select bg-light border-0">
-                                <option value="pns">PNS (Gaji Tetap)</option>
-                                <option value="honorer">Honorer (Per Kehadiran)</option>
-                            </select>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-12 mb-3" id="salaryGroup">
-                                <label class="small fw-bold text-muted mb-2">Gaji Pokok (Rp)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0">Rp</span>
-                                    <input type="number" name="base_salary" class="form-control bg-light border-0" placeholder="0">
+    <div class="card border-0 shadow-sm overflow-hidden" style="border-radius: 1.25rem;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-slate-50 border-bottom">
+                    <tr>
+                        <th class="ps-4 py-3 text-muted small fw-bold text-uppercase">Identitas & Alamat</th>
+                        <th class="py-3 text-muted small fw-bold text-uppercase">Alamat</th>
+                        <th class="py-3 text-muted small fw-bold text-uppercase">Kontak</th>
+                        <th class="py-3 text-muted small fw-bold text-uppercase">Gaji</th>
+                        <th class="py-3 text-muted small fw-bold text-uppercase">Status</th>
+                        <th class="text-end pe-4 py-3 text-muted small fw-bold text-uppercase">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="border-top-0">
+                    @forelse($teachers as $t)
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-md bg-indigo text-white rounded-circle me-3 d-flex align-items-center justify-content-center fw-bold shadow-sm">
+                                    {{ strtoupper(substr($t->name, 0, 1)) }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold text-slate-900 mb-0">{{ $t->name }}</div>
+                                    <div class="small text-slate-600">
+                                        <i class="bi bi-card-heading"></i>NIP: <span class="text-indigo">{{ $t->nip ?? '-' }}</span>
+                                    </div>
                                 </div>
                             </div>
+                        </td>
 
-                            <div class="col-12" id="honorGroup" style="display:none;">
-                                <label class="small fw-bold text-muted mb-2">Honor / Kehadiran (Rp)</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-0">Rp</span>
-                                    <input type="number" name="salary_per_presence" class="form-control bg-light border-0" placeholder="0">
-                                </div>
+                        <td>
+                            <div class="small text-muted text-truncate" style="max-width: 150px;" title="{{ $t->address }}">
+                                <i class="bi bi-geo-alt me-1"></i>{{ $t->address ?? 'Alamat belum diset' }}
                             </div>
-                        </div>
+                        </td>
+                        <td>
+                            <div class="small mb-1">
+                                <i class="bi bi-envelope-fill text-indigo me-1"></i>
+                                <span class="text-slate-700">{{ $t->email ?? '-' }}</span>
+                            </div>
+                        </td>
 
-                        <button type="submit" class="btn btn-indigo w-100 py-2 shadow-sm mt-2" style="border-radius: 10px;">
-                            <i class="bi bi-save2 me-2"></i>Simpan Data Guru
-                        </button>
-                    </form>
-                </div>
-            </div>
+                        <td>
+                            <div class="d-flex flex-column">
+                                @if($t->employee_type == 'pns')
+                                <span class="text-indigo fw-bold small mb-1"></span>
+                                <span class="fw-bold text-slate-800">Rp{{ number_format($t->base_salary, 0, ',', '.') }}</span>
+                                @else
+                                <span class="text-amber fw-bold small mb-1"></span>
+                                <span class="fw-bold text-slate-800">Rp{{ number_format($t->salary_per_presence, 0, ',', '.') }} <small class="text-muted fw-normal">/hadir</small></span>
+                                @endif
+                            </div>
+                        </td>
+
+                        <td>
+                            <span class="badge bg-success-soft text-success border-0 px-2 py-1 rounded-pill small">
+                                <i class="bi bi-check-circle-fill me-1"></i>Aktif
+                            </span>
+                        </td>
+
+                        <td class="text-end pe-4">
+                            <div class="btn-group gap-2">
+                                <button class="btn btn-white border shadow-none rounded-pill px-3 btn-sm fw-bold"
+                                    title="Detail Guru">
+                                    <i class="bi bi-person-badge me-1"></i>Detail Guru
+                                </button>
+
+                                <button class="btn btn-white border shadow-none rounded-pill px-3 btn-sm text-indigo fw-bold"
+                                    title="Edit Guru">
+                                    <i class="bi bi-pencil-square me-1"></i>Edit
+                                </button>
+
+                                <form action="#" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="button" class="btn btn-white border shadow-none rounded-pill px-3 btn-sm text-danger fw-bold"
+                                        title="Hapus Guru">
+                                        <i class="bi bi-trash3-fill me-1"></i>Hapus
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="5" class="text-center py-5 text-muted">Belum ada data guru.</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
+    </div>
+</div>
 
-        <div class="col-lg-8">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 1.25rem; overflow: hidden;">
-                <div class="card-header bg-white border-0 p-4">
-                    <h5 class="fw-bold mb-0">Daftar Aktif</h5>
+<div class="modal fade" id="addTeacherModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 1.5rem;">
+            <div class="modal-header border-0 p-4 pb-0">
+                <div class="bg-indigo-soft p-2 rounded-3 me-3">
+                    <i class="bi bi-person-plus text-indigo fs-5"></i>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="bg-light text-muted small text-uppercase tracking-wider">
-                            <tr>
-                                <th class="px-4 py-3">Info Guru</th>
-                                <th class="py-3">Status</th>
-                                <th class="py-3">Komponen Gaji</th>
-                                <th class="py-3 text-end px-4">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($teachers as $t)
-                            <tr>
-                                <td class="px-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar-sm bg-indigo-soft text-indigo rounded-circle me-3 d-flex align-items-center justify-content-center fw-bold">
-                                            {{ substr($t->name, 0, 1) }}
-                                        </div>
-                                        <div>
-                                            <div class="fw-bold text-dark">{{ $t->name }}</div>
-                                            <small class="text-muted">{{ $t->email ?? 'Belum ada email' }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="badge {{ $t->employee_type == 'pns' ? 'bg-indigo-soft text-indigo' : 'bg-success-soft text-success' }} px-3 py-2 rounded-pill">
-                                        {{ strtoupper($t->employee_type) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="small">
-                                        <span class="text-muted d-block">Pokok: <span class="text-dark fw-bold">Rp{{ number_format($t->base_salary, 0, ',', '.') }}</span></span>
-                                        <span class="text-muted d-block">Honor: <span class="text-dark fw-bold">Rp{{ number_format($t->salary_per_presence, 0, ',', '.') }}</span></span>
-                                    </div>
-                                </td>
-                                <td class="text-end px-4">
-                                    <div class="dropdown">
-                                        <button class="btn btn-light btn-sm rounded-pill shadow-none" type="button" data-bs-toggle="dropdown">
-                                            <i class="bi bi-three-dots-vertical"></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-sm p-2">
-                                            <li><a class="dropdown-item rounded-3" href="#"><i class="bi bi-pencil me-2"></i> Edit</a></li>
-                                            <li>
-                                                <hr class="dropdown-divider">
-                                            </li>
-                                            <li><a class="dropdown-item rounded-3 text-danger" href="#"><i class="bi bi-trash me-2"></i> Hapus</a></li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                <h5 class="modal-title fw-bold text-slate-900">Registrasi Guru Baru</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
+            <form action="{{ route('admin.teachers.store') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted mb-2">Nama Lengkap (Tanpa Gelar)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-slate-50 border-0"><i class="bi bi-person text-indigo"></i></span>
+                            <input type="text" name="name" class="form-control bg-slate-50 border-0 py-2 shadow-none" placeholder="Contoh: Ahmad Subarjo" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="small fw-bold text-muted mb-2">Alamat Email Aktif</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-slate-50 border-0"><i class="bi bi-envelope-at text-indigo"></i></span>
+                            <input type="email" name="email" class="form-control bg-slate-50 border-0 py-2 shadow-none" placeholder="nama@sekolah.com" required>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-indigo-soft rounded-4 mb-4">
+                        <label class="small fw-bold text-indigo mb-2">Tipe & Konfigurasi Penggajian</label>
+                        <select name="employee_type" id="typeSelector" class="form-select border-0 py-2 mb-3 shadow-none fw-bold text-slate-800">
+                            <option value="pns">PNS (Sistem Gaji Tetap)</option>
+                            <option value="honorer">HONORER (Sistem Per Kehadiran)</option>
+                        </select>
+
+                        <div id="salaryGroup">
+                            <label class="small fw-bold text-muted mb-2">Gaji Pokok Bulanan</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-0 text-slate-400 fw-bold">Rp</span>
+                                <input type="number" name="base_salary" class="form-control border-0 py-2 shadow-none fw-bold" value="0">
+                            </div>
+                        </div>
+
+                        <div id="honorGroup" style="display:none;">
+                            <label class="small fw-bold text-muted mb-2">Honor Per Kehadiran</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-0 text-slate-400 fw-bold">Rp</span>
+                                <input type="number" name="salary_per_presence" class="form-control border-0 py-2 shadow-none fw-bold" value="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 p-4 pt-0">
+                    <button type="button" class="btn btn-light rounded-3 py-2 px-4 fw-bold text-muted" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-indigo rounded-3 py-2 px-4 fw-bold text-white shadow-indigo border-0">Simpan Data</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
 
 <style>
     :root {
-        --indigo-color: #1E1B4B;
+        --indigo: #4f46e5;
         --indigo-soft: #eef2ff;
-        --success-soft: #ecfdf5;
+        --slate-900: #0f172a;
+        --slate-700: #334155;
+        --slate-50: #f8fafc;
+        --amber: #d97706;
+        --amber-soft: #fffbeb;
     }
 
-    .text-indigo {
-        color: var(--indigo-color);
+    .text-slate-900 {
+        color: var(--slate-900);
     }
 
-    .bg-indigo {
-        background-color: var(--indigo-color);
-    }
-
-    .btn-indigo {
-        background-color: var(--indigo-color);
-        color: white;
-        transition: 0.3s;
-    }
-
-    .btn-indigo:hover {
-        background-color: #312E81;
-        color: white;
+    .bg-slate-50 {
+        background-color: var(--slate-50);
     }
 
     .bg-indigo-soft {
         background-color: var(--indigo-soft);
     }
 
-    .bg-success-soft {
-        background-color: var(--success-soft);
+    .text-indigo {
+        color: var(--indigo);
     }
 
-    .avatar-sm {
-        width: 40px;
-        height: 40px;
+    .bg-indigo {
+        background-color: var(--indigo);
     }
 
-    .tracking-wider {
-        letter-spacing: 0.05rem;
+    .bg-amber-soft {
+        background-color: var(--amber-soft);
     }
 
-    /* Form Styling */
+    .text-amber {
+        color: var(--amber);
+    }
+
+    .btn-indigo {
+        background-color: var(--indigo);
+        transition: all 0.3s;
+    }
+
+    .btn-indigo:hover {
+        background-color: #4338ca;
+        transform: translateY(-1px);
+    }
+
+    .shadow-indigo {
+        box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+    }
+
+    .avatar-md {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+
+    .fs-xs {
+        font-size: 0.6rem;
+    }
+
+    .btn-icon-sm {
+        padding: 0.25rem 0.5rem;
+    }
+
+    .btn-white:hover {
+        background-color: var(--slate-50);
+    }
+
+    .salary-display {
+        min-width: 140px;
+    }
+
     .form-control:focus,
     .form-select:focus {
         background-color: #fff !important;
-        border: 1px solid var(--indigo-color) !important;
-        box-shadow: none;
+        box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.1) !important;
     }
 
-    .input-group-text {
-        border-radius: 10px 0 0 10px;
-    }
-
-    input.form-control {
-        border-radius: 0 10px 10px 0;
+    .border-dashed {
+        border-style: dashed !important;
     }
 </style>
 
 <script>
-    document.getElementById('typeSelector').addEventListener('change', function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        const selector = document.getElementById('typeSelector');
         const salaryGroup = document.getElementById('salaryGroup');
         const honorGroup = document.getElementById('honorGroup');
 
-        if (this.value === 'pns') {
-            salaryGroup.style.display = 'block';
-            honorGroup.style.display = 'none';
-        } else {
-            salaryGroup.style.display = 'none';
-            honorGroup.style.display = 'block';
+        function toggleFields() {
+            if (selector.value === 'pns') {
+                salaryGroup.style.display = 'block';
+                honorGroup.style.display = 'none';
+            } else {
+                salaryGroup.style.display = 'none';
+                honorGroup.style.display = 'block';
+            }
         }
+
+        selector.addEventListener('change', toggleFields);
+        toggleFields(); // Init on load
     });
 </script>
 @endsection

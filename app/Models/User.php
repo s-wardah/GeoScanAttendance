@@ -22,6 +22,10 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role',
+        'employee_type',
+        'base_salary',
+        'salary_per_presence',
     ];
 
     /**
@@ -49,5 +53,9 @@ class User extends Authenticatable
     public function attendances()
     {
         return $this->hasMany(Attendances::class, 'user_id');
+    }
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class, 'user_id');
     }
 }

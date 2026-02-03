@@ -16,8 +16,8 @@
                 <div class="mb-3 d-flex justify-content-center">
                     <div class="position-relative">
                         <img src="https://ui-avatars.com/api/?name={{ auth()->user()->name }}&background=1E1B4B&color=fff&size=100"
-                            class="rounded-circle shadow-sm border border-4 border-white" style="width: 90px;">
-                        <span class="position-absolute bottom-0 end-0 bg-success border border-2 border-white rounded-circle" style="width: 18px; height: 18px;"></span>
+                            class="rounded-circle shadow-sm border border-white" style="width: 90px;">
+                        <span class="position-absolute bottom-0 end-0 bg-success border border-white rounded-circle" style="width: 18px; height: 18px;"></span>
                     </div>
                 </div>
                 <h5 class="fw-bold mb-1" style="color: #1E1B4B;">{{ auth()->user()->name }}</h5>
@@ -54,44 +54,66 @@
             </div>
         </div>
 
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm p-4 h-100 hover-shadow transition" style="border-radius: 1.5rem; border-left: 6px solid #1E1B4B !important;">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <p class="text-muted extra-small fw-bold text-uppercase tracking-wider">Kehadiran Bulan Ini</p>
-                </div>
-                <div class="d-flex align-items-baseline">
-                    <h2 class="fw-bold mb-0" style="color: #1E1B4B; font-size: 3rem;">
-                        {{ auth()->user()->attendances()->whereMonth('created_at', now()->month)->count() }}
-                    </h2>
-                    <span class="ms-2 text-muted fw-medium">Hari Hadir</span>
-                </div>
-                <div class="mt-3">
-                    <div class="progress" style="height: 8px; border-radius: 10px;">
-                        <div class="progress-bar" role="progressbar" style="width: 75%; background-color: #1E1B4B;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                    </div>
-                </div>
+        <div class="col-12">
+            @if(session('success'))
+            <div class="alert alert-success border-0 shadow-sm rounded-3 mb-4">
+                {{ session('success') }}
             </div>
-        </div>
+            @endif
 
-        <div class="col-md-6">
-            <div class="card border-0 shadow-sm p-4 h-100 hover-shadow transition" style="border-radius: 1.5rem; border-left: 6px solid #198754 !important;">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <p class="text-muted extra-small fw-bold text-uppercase tracking-wider">Estimasi Honorarium</p>
+            @if($errors->any())
+            <div class="alert alert-danger border-0 shadow-sm rounded-3 mb-4">
+                Cek kembali isian form Anda!
+            </div>
+            @endif
+
+            <div class="d-grid mb-4">
+                <a href="{{ route('teacher.permission.index') }}"
+                    class="btn text-white rounded-pill py-3 shadow-sm fw-bold hover-scale transition"
+                    style="background: linear-gradient(135deg, #1E1B4B 0%, #3f3da1 100%); border: none;">
+                    <i class="bi bi-file-earmark-plus-fill me-2"></i> Ajukan Izin / Sakit
+                </a>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4 h-100 hover-shadow transition" style="border-radius: 1.5rem; border-left: 6px solid #1E1B4B !important;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <p class="text-muted extra-small fw-bold text-uppercase tracking-wider">Kehadiran Bulan Ini</p>
+            </div>
+            <div class="d-flex align-items-baseline">
+                <h2 class="fw-bold mb-0" style="color: #1E1B4B; font-size: 3rem;">
+                    {{ auth()->user()->attendances()->whereMonth('created_at', now()->month)->count() }}
+                </h2>
+                <span class="ms-2 text-muted fw-medium">Hari Hadir</span>
+            </div>
+            <div class="mt-3">
+                <div class="progress" style="height: 8px; border-radius: 10px;">
+                    <div class="progress-bar" role="progressbar" style="width: 75%; background-color: #1E1B4B;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
-                @php
-                $count = auth()->user()->attendances()->whereMonth('created_at', now()->month)->count();
-                $total = auth()->user()->base_salary + ($count * auth()->user()->salary_per_presence);
-                @endphp
-                <div class="d-flex align-items-baseline">
-                    <span class="fs-4 fw-bold text-success me-1">Rp</span>
-                    <h2 class="fw-bold text-success mb-0" style="font-size: 3rem;">
-                        {{ number_format($total, 0, ',', '.') }}
-                    </h2>
-                </div>
-                <p class="text-muted extra-small mt-3 italic">*Gaji pokok + total insentif kehadiran</p>
             </div>
         </div>
     </div>
+
+    <div class="col-md-6">
+        <div class="card border-0 shadow-sm p-4 h-100 hover-shadow transition" style="border-radius: 1.5rem; border-left: 6px solid #198754 !important;">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+                <p class="text-muted extra-small fw-bold text-uppercase tracking-wider">Estimasi Honorarium</p>
+            </div>
+            @php
+            $count = auth()->user()->attendances()->whereMonth('created_at', now()->month)->count();
+            $total = auth()->user()->base_salary + ($count * auth()->user()->salary_per_presence);
+            @endphp
+            <div class="d-flex align-items-baseline">
+                <span class="fs-4 fw-bold text-success me-1">Rp</span>
+                <h2 class="fw-bold text-success mb-0" style="font-size: 3rem;">
+                    {{ number_format($total, 0, ',', '.') }}
+                </h2>
+            </div>
+            <p class="text-muted extra-small mt-3 italic">*Gaji pokok + total insentif kehadiran</p>
+        </div>
+    </div>
+</div>
 </div>
 
 <style>
@@ -105,7 +127,7 @@
     }
 
     .hover-scale:hover {
-        transform: scale(1.05);
+        transform: scale(1.02);
         filter: brightness(1.1);
     }
 
@@ -113,7 +135,6 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Penyesuaian Main Area */
     #content {
         padding: 2rem !important;
     }
